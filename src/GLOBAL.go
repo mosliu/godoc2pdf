@@ -1,3 +1,3 @@
 package main
 
-var CONFIGFILEPATH="./conf.yaml"
+var CONFIGFILENAME="conf.yaml"

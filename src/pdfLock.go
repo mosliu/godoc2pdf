@@ -31,7 +31,6 @@ func testEncrypt(inputPath string) (bool, error) {
     if err != nil {
         return false, err
     }
-
     isEncrypted, err := pdfReader.IsEncrypted()
     if err != nil {
         return false, err
@@ -64,29 +63,29 @@ func printAccessInfo(inputPath string, password string) (error) {
     }
 
     if !canView {
-        log.Infof("%s - Cannot view - No access with the specified password\n", inputPath)
+        log.Infof("%s - Cannot view - No access with the specified password", inputPath)
         //return nil
     }
 
-    log.Infof("Input file %s\n", inputPath)
-    log.Infof("Access Permissions: %+v\n", perms)
-    log.Infof("--------\n")
+    log.Infof("Input file %s", inputPath)
+    log.Infof("Access Permissions: %+v", perms)
+    log.Infof("--------")
 
     // Print a text summary of the flags.
     booltext := map[bool]string{false: "No", true: "Yes"}
-    log.Infof("Printing allowed? - %s\n", booltext[perms.Printing])
+    log.Infof("Printing allowed? - %s", booltext[perms.Printing])
     if perms.Printing {
-        log.Infof("Full print quality (otherwise print in low res)? - %s\n", booltext[perms.FullPrintQuality])
+        log.Infof("Full print quality (otherwise print in low res)? - %s", booltext[perms.FullPrintQuality])
     }
-    log.Infof("Modifications allowed? - %s\n", booltext[perms.Modify])
-    log.Infof("Allow extracting graphics? %s\n", booltext[perms.ExtractGraphics])
-    log.Infof("Can annotate? - %s\n", booltext[perms.Annotate])
+    log.Infof("Modifications allowed? - %s", booltext[perms.Modify])
+    log.Infof("Allow extracting graphics? %s", booltext[perms.ExtractGraphics])
+    log.Infof("Can annotate? - %s", booltext[perms.Annotate])
     if perms.Annotate {
-        log.Infof("Can fill forms? - Yes\n")
+        log.Infof("Can fill forms? - Yes")
     } else {
-        log.Infof("Can fill forms? - %s\n", booltext[perms.FillForms])
+        log.Infof("Can fill forms? - %s", booltext[perms.FillForms])
     }
-    log.Infof("Extract text, graphics for users with disabilities? - %s\n", booltext[perms.DisabilityExtract])
+    log.Infof("Extract text, graphics for users with disabilities? - %s", booltext[perms.DisabilityExtract])
 
     return nil
 }
@@ -225,31 +224,32 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
     return err
 }
 
-func addWaterMarkAndEncryptedByConf(inputfile string) {
+func addWaterMarkAndEncryptByConf(inputfile string) {
     outDir, outFilename := filepath.Split(inputfile)
     outputPath := filepath.Join(outDir, "Done_"+outFilename)
     watermarkFile := config.Watermark.Path
-    addWatermarkImage(inputfile, outputPath, watermarkFile)
     userPass := config.Security.UserPass.Password2Add
+    ownerPass := config.Security.OwnerPass.Password2Add
+    addWaterMarkAndEncrypt(inputfile, outputPath, watermarkFile, userPass, ownerPass)
+
+}
+func addWaterMarkAndEncrypt(inputfile string, outputPath string, watermarkFile string, userPass string, ownerPass string) {
+    addWatermarkImage(inputfile, outputPath, watermarkFile)
     if config.Security.UserPass.Enable == false {
         userPass = ""
     }
-    ownerPass := config.Security.OwnerPass.Password2Add
     if config.Security.OwnerPass.Enable == false {
         ownerPass = ""
     }
     //如果有一个需要加密则执行
-    if config.Security.UserPass.Enable||config.Security.OwnerPass.Enable {
+    if config.Security.UserPass.Enable || config.Security.OwnerPass.Enable {
         addPassword(outputPath, outputPath, userPass, ownerPass)
     }
-
     err := printAccessInfo(inputfile, ownerPass)
     if err != nil {
         log.Errorf("Error: %v\n", err)
     }
-
 }
-
 
 //depreciated
 func dopdf2(inputfile string, pass string) {
@@ -268,13 +268,13 @@ func dopdf2(inputfile string, pass string) {
 
 func cliWaterMarkAndEncrypt() cli.Command {
     command := cli.Command{
-        Name:        "unidoc",
+        Name:        "pdfLock",
         Aliases:     []string{"p"},
-        Category:    "Common tools",
-        Usage:       "Check a exe is 32bit or 64 bit",
-        UsageText:   "Example: mo exe64 c:\a.exe ",
-        Description: "Check a exe is 32bit or 64 bit.",
-        ArgsUsage:   "<filename>",
+        Category:    "Tools",
+        Usage:       "Watermark and Lock a pdf file",
+        UsageText:   "Example: doc2pdf pdfLock ./xxxx.pdf",
+        Description: "Watermark and Lock a pdf file",
+        ArgsUsage:   "<filename> <password>",
         //Flags: []cli.Flag{
         //    cli.BoolFlag{
         //        Name:   "show,s",
@@ -286,7 +286,7 @@ func cliWaterMarkAndEncrypt() cli.Command {
             if c.NArg() < 2 {
                 log.Fatal("Args' number less than 2")
             }
-            dopdf2(c.Args().First(), c.Args().Get(1))
+            addWaterMarkAndEncryptByConf(c.Args().First())
             //calcBase(c.Args().First(), c.Bool("debase"))
             return nil
         },

@@ -8,6 +8,8 @@ import (
     "path/filepath"
     "os"
     "github.com/fatih/color"
+    "os/exec"
+    "fmt"
 )
 
 var config Configuration
@@ -86,7 +88,11 @@ func (c *Configuration) writeConf(path string) (err error) {
 }
 
 func init() {
-    config.getConf("conf.yaml")
+    file1, _ := exec.LookPath("./"+CONFIGFILENAME)
+    path1, _ := filepath.Abs(file1)
+    color.Green(path1)
+    fmt.Println(path1)
+    config.getConf(path1)
 }
 
 //用于根据定义的结构，生成yaml模板

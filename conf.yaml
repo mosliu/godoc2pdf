@@ -1,17 +1,23 @@
 loglevel: INFO
 compress: false
 convert:
+#是否开启转换
   enable: true
   suffixallow: [doc, docx, xls, xlsx, ppt, pptx]
 watermark:
+#是否开启水印
   enable: true
   path: "aaa.png"
 security:
   userpass:
+  #是否添加打开密码
     enable: false
+  #打开密码设定，不开启需要保留空
     password2add: ""
   ownerpass:
+  #是否添加修改密码
     enable: true
+  #修改密码设定，不开启需要保留空
     password2add: "Lt12345"
     printing: false
     fullprintquality: false

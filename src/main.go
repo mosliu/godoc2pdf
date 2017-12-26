@@ -5,17 +5,20 @@ import (
     "os"
     "time"
 
+    "path/filepath"
+
     "github.com/fatih/color"
     "github.com/urfave/cli"
+    "strings"
 )
 
 var done = make(chan bool, 1)
+var SUPPORT_OFFICE_TYPE = []string{".docx", ".doc",".txt",".htm",".html",".mhtml", ".xls", "xlsx", ".ppt", ".pptx",}
 
 func main() {
-    initLogger("info")
 
     app := cli.NewApp()
-    app.Name = "RPC test Tool"
+    app.Name = "Doc2Pdf Tool"
     app.Version = "1.0.0.0"
     app.Compiled = time.Now()
     app.Authors = []cli.Author{
@@ -24,19 +27,20 @@ func main() {
             Email: "liuxuan@liuxuan.net",
         },
     }
-    app.Copyright = "(c) 2017 Labthink Support Group."
-    app.Usage = "CZY-6S device time correction tool"
-    app.UsageText = "Example: Tool.exe COM1"
-    app.ArgsUsage = "<COMPORT>"
+    app.Copyright = "(c) 2018 Labthink Support Group."
+    app.Usage = "Convert A doc file to pdf, add watermark and use password to protect it."
+    app.UsageText = "Example: doc2pdf ./aaa.doc"
+    app.ArgsUsage = "<filename>"
     app.Flags = []cli.Flag{
         cli.BoolFlag{
-            Name: "debug,d",
+            Name: "verbose",
             //Hidden: true,
-            Usage: "language for the greeting",
+            Usage: "show detail convert info (not work)",
         },
     }
 
     app.Action = func(c *cli.Context) error {
+
         //log.Debug("Opening Serial Port...0")
         //log.Info("Opening Serial Port...1")
         //log.Warn("Opening Serial Port...2")
@@ -49,26 +53,37 @@ func main() {
         } else {
             initLogger("info")
         }
-        log.Info(c.NArg(),c.Args().First())
-        log.Info("Author:Liu Xuan,last modified at 2017/11/30")
+        log.Info(c.NArg(), " args [", c.Args().First(), "]")
+        logF.Info(c.NArg(), " args [", c.Args().First(), "]")
+        log.Info("Author:Liu Xuan,last modified at 2017/12/22")
 
-        log.Info("Opening Serial Port...")
-        time.AfterFunc(time.Minute*1, func() {
-            done <- true
-        })
+        if c.NArg() > 1 || c.NArg() < 0 {
+            log.Error("Wrong usage.Try to drag one file on this tool.")
+            os.Exit(2)
+        } else {
+            inputOfficeFilePath := c.Args().First()
+            if fileIsExist(inputOfficeFilePath) {
+                startConvert(inputOfficeFilePath)
+            } else {
+                logF.Error("the input file is not existed.")
+            }
+        }
+
+        //time.AfterFunc(time.Minute*1, func() {
+        //    done <- true
+        //})
         //wait for terminal signal
         start()
-
-
 
         return nil
     }
 
     app.Commands = []cli.Command{
-        pdf1(),
-        pdf2(),
+        //生成conf.yaml模板
+        createTemplate(),
+        cliWaterMarkAndEncrypt(),
         //office2pdf(),
-        office2pdfcli(),
+        cliOffice2pdf(),
     }
 
     defer func() {
@@ -78,15 +93,56 @@ func main() {
         }
     }()
 
-
-
     app.Run(os.Args)
+}
+func startConvert(officeFile string) {
+    var outFile string
+    var err error
+    log.Info("Start Processing...")
+    rootPath := filepath.Dir(officeFile)
+    inFile, _ := filepath.Abs(officeFile)
+    outDir, _ := filepath.Abs(rootPath)
+    inFileExt := filepath.Ext(inFile)
+    inFileExt = strings.ToLower(inFileExt)
+    var isFileExtOk = false
+    for _, item := range SUPPORT_OFFICE_TYPE {
+        if strings.Compare(inFileExt, item) == 0 {
+            isFileExtOk = true
+        }
+    }
+    //convert to pdf
+    if isFileExtOk {
+        exporter := exporterMap()[filepath.Ext(inFile)]
+        if _, ok := exporter.(Exporter); ok {
+            outFile, err = exporter.(Exporter).Export(inFile, outDir)
+            if err != nil {
+                logF.Fatal(err)
+            }
+            log.Info("output pdf file: " + outFile)
+        }
+        addWaterMarkAndEncryptByConf(outFile)
+    } else {
+        if strings.Compare(inFileExt, ".pdf") == 0 {
+            ok, err := testEncrypt(inFile)
+            if err != nil {
+                log.Fatal(err)
+            }
+            if ok {
+                log.Info(color.RedString("The file is Encrypted!Can not operate"))
+                printAccessInfo(inFile, "")
+            }else{
+                addWaterMarkAndEncryptByConf(inFile)
+            }
+
+
+        }
+    }
 }
 
 func start() {
 
-    <-done
-    color.Blue("本次校正结束,可以关闭了")
+    //<-done
+    color.Blue("Operate finished.Press Enter to Close This Program!")
     var out string
     fmt.Scanln(&out)
 
