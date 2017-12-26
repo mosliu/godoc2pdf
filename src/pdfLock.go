@@ -38,7 +38,7 @@ func testEncrypt(inputPath string) (bool, error) {
     if isEncrypted {
         log.Infof("The PDF is already locked")
     }
-    return true, err
+    return isEncrypted, err
 }
 
 // printAccessInfo
@@ -174,8 +174,8 @@ func addPassword(inputfilepath string, outputPath string, userPass string, owner
 
 // Watermark pdf file based on an image.
 func addWatermarkImage(inputPath string, outputPath string, watermarkPath string) error {
-    unicommon.Log.Debug("Input PDF: %v", inputPath)
-    unicommon.Log.Debug("Watermark image: %s", watermarkPath)
+    //unicommon.Log.Debug("Input PDF: %v", inputPath)
+    //unicommon.Log.Debug("Watermark image: %s", watermarkPath)
 
     c := creator.New()
 
@@ -245,7 +245,7 @@ func addWaterMarkAndEncrypt(inputfile string, outputPath string, watermarkFile s
     if config.Security.UserPass.Enable || config.Security.OwnerPass.Enable {
         addPassword(outputPath, outputPath, userPass, ownerPass)
     }
-    err := printAccessInfo(inputfile, ownerPass)
+    err := printAccessInfo(inputfile, "")
     if err != nil {
         log.Errorf("Error: %v\n", err)
     }

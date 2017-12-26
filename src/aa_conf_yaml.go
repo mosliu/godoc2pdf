@@ -9,7 +9,6 @@ import (
     "os"
     "github.com/fatih/color"
     "os/exec"
-    "fmt"
 )
 
 var config Configuration
@@ -90,8 +89,8 @@ func (c *Configuration) writeConf(path string) (err error) {
 func init() {
     file1, _ := exec.LookPath("./"+CONFIGFILENAME)
     path1, _ := filepath.Abs(file1)
-    color.Green(path1)
-    fmt.Println(path1)
+    //color.Green(path1)
+    //fmt.Println(path1)
     config.getConf(path1)
 }
 
