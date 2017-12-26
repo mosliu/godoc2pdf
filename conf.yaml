@@ -1,0 +1,26 @@
+loglevel: INFO
+compress: false
+convert:
+  enable: true
+  suffixallow: [doc, docx, xls, xlsx, ppt, pptx]
+watermark:
+  enable: true
+  path: "aaa.png"
+security:
+  userpass:
+    enable: false
+    password2add: ""
+  ownerpass:
+    enable: true
+    password2add: "Lt12345"
+    printing: false
+    fullprintquality: false
+    modify: false
+    annotate: false
+    fillforms: false
+    rotateinsert: false
+    extractgraphics: false
+    disabilityextract: false
+enabled: true
+path: ""
+path2: ""
