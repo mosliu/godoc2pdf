@@ -1,4 +1,5 @@
 package main
+
 //名字前面加aa 为了保证第一个初始化
 import (
     //https://github.com/go-yaml/yaml
@@ -87,7 +88,17 @@ func (c *Configuration) writeConf(path string) (err error) {
 }
 
 func init() {
-    file1, _ := exec.LookPath("./"+CONFIGFILENAME)
+    //dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+    dir := getMainExePath()
+    confDir := filepath.Join(dir, CONFIGFILENAME)
+    color.Green("Load configuration file at:%s", confDir)
+    //file1, err := exec.LookPath("./"+CONFIGFILENAME)
+    file1, err := exec.LookPath(confDir)
+    if err != nil {
+        //fmt.Printf("yamlFile.Get err   #%v ", err)
+        color.Red("lookPath error", "./"+CONFIGFILENAME, err)
+
+    }
     path1, _ := filepath.Abs(file1)
     //color.Green(path1)
     //fmt.Println(path1)
@@ -141,7 +152,7 @@ func createTemplate() cli.Command {
                 }
                 if canGenFlag {
                     createYamlFile(destPath)
-                }else{
+                } else {
                     color.Red("Error occurred,check args.")
                 }
             } else {

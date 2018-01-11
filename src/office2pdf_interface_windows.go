@@ -6,7 +6,6 @@ package main
 import (
     "github.com/urfave/cli"
     "path/filepath"
-    "os"
 )
 
 type Exporter interface {
@@ -75,11 +74,4 @@ func cliOffice2pdf() cli.Command {
         },
     }
     return command
-}
-
-func fileIsExist(path string) bool {
-    if _, err := os.Stat(path); os.IsNotExist(err) {
-        return false
-    }
-    return true
 }

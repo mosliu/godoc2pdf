@@ -179,6 +179,10 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 
     c := creator.New()
 
+    if !fileIsExist(watermarkPath) {
+        watermarkPath = filepath.Join(getMainExePath(),watermarkPath)
+    }
+
     watermarkImg, err := creator.NewImageFromFile(watermarkPath)
     if err != nil {
         return err
@@ -234,7 +238,10 @@ func addWaterMarkAndEncryptByConf(inputfile string) {
 
 }
 func addWaterMarkAndEncrypt(inputfile string, outputPath string, watermarkFile string, userPass string, ownerPass string) {
-    addWatermarkImage(inputfile, outputPath, watermarkFile)
+    err:=addWatermarkImage(inputfile, outputPath, watermarkFile)
+    if err !=nil {
+        log.Error(err)
+    }
     if config.Security.UserPass.Enable == false {
         userPass = ""
     }
@@ -245,7 +252,7 @@ func addWaterMarkAndEncrypt(inputfile string, outputPath string, watermarkFile s
     if config.Security.UserPass.Enable || config.Security.OwnerPass.Enable {
         addPassword(outputPath, outputPath, userPass, ownerPass)
     }
-    err := printAccessInfo(inputfile, "")
+    err = printAccessInfo(inputfile, "")
     if err != nil {
         log.Errorf("Error: %v\n", err)
     }
