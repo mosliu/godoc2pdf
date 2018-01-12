@@ -10,6 +10,7 @@ import (
     "github.com/unidoc/unidoc/pdf/creator"
     pdf "github.com/unidoc/unidoc/pdf/model"
     "github.com/urfave/cli"
+    "github.com/unidoc/unidoc/pdf/model/fonts"
 )
 
 func init() {
@@ -173,14 +174,21 @@ func addPassword(inputfilepath string, outputPath string, userPass string, owner
 }
 
 // Watermark pdf file based on an image.
-func addWatermarkImage(inputPath string, outputPath string, watermarkPath string) error {
+func addWatermarkImageAndDateMark(inputPath string, outputPath string, watermarkPath string, addDateFlag bool) error {
     //unicommon.Log.Debug("Input PDF: %v", inputPath)
     //unicommon.Log.Debug("Watermark image: %s", watermarkPath)
+
+    //xinweiFont, err := pdf.NewPdfFontFromTTFFile("./STXINWEI.TTF")
+    //使用了unidoc的compositefonts 分支
+    xinweiFont, err := pdf.NewCompositePdfFontFromTTFFile("./STXINWEI.TTF")
+    if err != nil {
+        return err
+    }
 
     c := creator.New()
 
     if !fileIsExist(watermarkPath) {
-        watermarkPath = filepath.Join(getMainExePath(),watermarkPath)
+        watermarkPath = filepath.Join(getMainExePath(), watermarkPath)
     }
 
     watermarkImg, err := creator.NewImageFromFile(watermarkPath)
@@ -214,18 +222,60 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
             return err
         }
 
+        _ = processPage(page)
+
         // Add to creator.
         c.AddPage(page)
 
         watermarkImg.ScaleToWidth(c.Context().PageWidth)
         watermarkImg.SetPos(0, (c.Context().PageHeight-watermarkImg.Height())/2)
         watermarkImg.SetOpacity(0.2)
-
         _ = c.Draw(watermarkImg)
-    }
 
+        if !addDateFlag {
+            p := creator.NewParagraph("hahahahaha")
+
+            p.SetFont(fonts.NewFontTimesBoldItalic())
+
+            p.SetPos(20.0, 20.0)
+            _ = c.Draw(p)
+        }
+    }
+    c.DrawFooter(func(block *creator.Block, args creator.FooterFunctionArgs) {
+        // Draw the on a block for each page.
+        p := creator.NewParagraph("啊unidoc.io哇卡卡卡")
+        p.SetFont(xinweiFont)
+        p.SetFontSize(8)
+        p.SetPos(50, 20)
+        p.SetColor(creator.ColorRGBFrom8bit(63, 68, 76))
+        block.Draw(p)
+
+        strPage := fmt.Sprintf("Page %d of %d", args.PageNum, args.TotalPages)
+        p = creator.NewParagraph(strPage)
+        p.SetFontSize(8)
+        p.SetPos(300, 20)
+        p.SetColor(creator.ColorRGBFrom8bit(63, 68, 76))
+        block.Draw(p)
+    })
+    c.SetPageMargins(0, 0, 0, 0)
     err = c.WriteToFile(outputPath)
     return err
+}
+
+func processPage(page *pdf.PdfPage) error {
+    mBox, err := page.GetMediaBox()
+    if err != nil {
+        return err
+    }
+    pageWidth := mBox.Urx - mBox.Llx
+    pageHeight := mBox.Ury - mBox.Lly
+
+    fmt.Printf(" Page: %+v\n", page)
+    fmt.Printf(" Page mediabox: %+v\n", page.MediaBox)
+    fmt.Printf(" Page height: %f\n", pageHeight)
+    fmt.Printf(" Page width: %f\n", pageWidth)
+
+    return nil
 }
 
 func addWaterMarkAndEncryptByConf(inputfile string) {
@@ -238,8 +288,8 @@ func addWaterMarkAndEncryptByConf(inputfile string) {
 
 }
 func addWaterMarkAndEncrypt(inputfile string, outputPath string, watermarkFile string, userPass string, ownerPass string) {
-    err:=addWatermarkImage(inputfile, outputPath, watermarkFile)
-    if err !=nil {
+    err := addWatermarkImageAndDateMark(inputfile, outputPath, watermarkFile, true)
+    if err != nil {
         log.Error(err)
     }
     if config.Security.UserPass.Enable == false {
@@ -266,7 +316,7 @@ func dopdf2(inputfile string, pass string) {
     outputPath := filepath.Join(outdir, "locked_"+outfilename)
     outputPath2 := filepath.Join(outdir, "watermarked_"+outfilename)
     log.Info("outName:", outputPath)
-    addWatermarkImage(inputfile, outputPath2, "./aaa.png")
+    addWatermarkImageAndDateMark(inputfile, outputPath2, "./aaa.png", true)
     addPassword(outputPath2, outputPath, pass, pass)
     if err != nil {
         log.Errorf("Error: %v\n", err)
