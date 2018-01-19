@@ -1,19 +1,34 @@
 package main
 
-//名字前面加aa 为了保证第一个初始化
 import (
-    //https://github.com/go-yaml/yaml
-    "gopkg.in/yaml.v2"
     "io/ioutil"
-    "github.com/urfave/cli"
+    "gopkg.in/yaml.v2"
     "path/filepath"
+    "os/exec"
+    "github.com/urfave/cli"
     "os"
     "github.com/fatih/color"
-    "os/exec"
 )
 
-var config Configuration
+// 内容区块P
+type Content struct {
+    Text         string
+    FontSize     float64 `yaml:"fontSize"`
+    UseFont      bool    `yaml:"useFont"`
+    PosX0        float64 `yaml:"posX0"`
+    PosY0        float64 `yaml:"posY0"`
+    RGB          []byte  `yaml:"rgb"`
+    DateFormat   string  `yaml:"dateFormat"`
+}
 
+type Margin struct {
+    Left   float64
+    Right  float64
+    Top    float64
+    Bottom float64
+}
+
+var config Configuration
 //注：约定优于配置
 //定义 struct中 首字母大写，yaml中 首字母小写 单词采用同一个
 type Configuration struct {
@@ -24,8 +39,28 @@ type Configuration struct {
         SuffixAllow []string `yaml:",flow"`
     }
     Watermark struct {
-        Enable bool
-        Path   string
+        Enable        bool
+        Path          string
+        WidthCenter   bool    `yaml:"widthCenter"`
+        WidthPos      float64 `yaml:"widthPos"`
+        HeightCenter  bool    `yaml:"heightCenter"`
+        HeightPos     float64 `yaml:"heightPos"`
+        Opacity       float64 `yaml:"opacity"`
+        ScaleToWidth  bool    `yaml:"scaleToWidth"`
+        ScaleToHeight bool    `yaml:"scaleToHeight"`
+    }
+    Textmark struct {
+        Margins Margin `yaml:"margin"`
+        HeadArea struct {
+            Enable   bool
+            FontPath string    `yaml:"fontPath"`
+            Contents []Content `yaml:"contents"`
+        } `yaml:"headArea"`
+        FootArea struct {
+            Enable   bool
+            FontPath string    `yaml:"fontPath"`
+            Contents []Content `yaml:"contents"`
+        } `yaml:"footArea"`
     }
     Security struct {
         UserPass struct {
@@ -107,6 +142,17 @@ func init() {
 
 //用于根据定义的结构，生成yaml模板
 func createYamlFile(path string) {
+    //var kkkk = []struct {
+    //    Aa string
+    //    Bb string
+    //}{
+    //    {"a", "multiple"},
+    //    {
+    //        "b",
+    //        "b-option",
+    //    },
+    //}
+    //config.Textmark.FootArea.Kkkk=kkkk
     d, err := yaml.Marshal(&config)
     if err != nil {
         color.Red("error: %v", err)
@@ -165,7 +211,4 @@ func createTemplate() cli.Command {
     return command
 }
 
-//func main() {
-//    fmt.Println(config)
-//    createYamlFile()>
-//}
+//`

@@ -54,7 +54,7 @@ func cliOffice2pdf() cli.Command {
 
             log.Info("input file: " + inFile + "\noutput dir: " + outDir)
 
-            if fileIsExist(inFile) && fileIsExist(outDir) {
+            if isFileExist(inFile) && isFileExist(outDir) {
                 log.Info("Processing...")
                 inFile, _ = filepath.Abs(inFile)
                 outDir, _ = filepath.Abs(outDir)

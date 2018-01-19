@@ -14,7 +14,7 @@ import (
 
 var done = make(chan bool, 1)
 var SUPPORT_OFFICE_TYPE = []string{".docx", ".doc",".txt",".htm",".html",".mhtml", ".xls", "xlsx", ".ppt", ".pptx",}
-
+var compileDate = "2018/1/10"
 func main() {
 
     app := cli.NewApp()
@@ -55,14 +55,14 @@ func main() {
         }
         log.Info(c.NArg(), " args [", c.Args().First(), "]")
         logF.Info(c.NArg(), " args [", c.Args().First(), "]")
-        log.Info("Author:Liu Xuan,last modified at 2017/12/22")
+        log.Info("Author:Liu Xuan,last modified at "+compileDate)
 
         if c.NArg() > 1 || c.NArg() < 0 {
             log.Error("Wrong usage.Try to drag one file on this tool.")
             os.Exit(2)
         } else {
             inputOfficeFilePath := c.Args().First()
-            if fileIsExist(inputOfficeFilePath) {
+            if isFileExist(inputOfficeFilePath) {
                 startConvert(inputOfficeFilePath)
             } else {
                 logF.Error("the input file is not existed.")
