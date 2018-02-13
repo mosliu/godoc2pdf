@@ -3,6 +3,7 @@
 ### Go template
 # Binaries for programs and plugins
 *.exe
+*.zip
 /*.pdf
 *.log
 *.ttf
