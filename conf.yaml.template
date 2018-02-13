@@ -1,0 +1,103 @@
+loglevel: INFO
+compress: false
+
+#是否开启转换
+convert:
+  enable: true
+  suffixallow: [doc, docx, xls, xlsx, ppt, pptx]
+watermark:
+#是否开启水印
+  enable: true
+  path: "aaa.png"
+  widthCenter: true
+  widthPos: 0
+  heightCenter: true
+  heightPos: 0
+  opacity: 0.2
+  scaleToWidth: true
+  scaleToHeight: false
+textmark:
+#是否开启文字添加
+  margin:
+        left: 0
+        right: 0
+        top: 0
+        bottom: 0
+  headArea:
+    enable: true
+    fontPath: "STXINWEI.TTF"
+    contents:
+      - text: "a啊哈开奖号萨福建省的烦恼了速度快烦死豆奶粉蓝思科技我IE如果屏幕的看病难的sss"
+        fontSize: 0.1
+        useFont: true
+        posX0: 50
+        posY0: 20
+        rgb: [63,68,76]
+      - text: "Page ${PageNum} of ${TotalPages}"
+        fontSize: 8
+        useFont: false
+        posX0: 300
+        posY0: 20
+        rgb: [63,68,76]
+      - text: "Convert at ${Date}"
+        fontSize: 8
+        useFont: true
+        posX0: 500
+        posY0: 40
+        rgb: [63,68,76]
+        dateFormat: "2006年01月02日15时"
+  footArea:
+    enable: true
+    fontPath: "STXINWEI.TTF"
+    contents:
+      - text: "a啊哈开奖号萨福建省的烦恼了速度快烦死豆奶粉蓝思科技我IE如果屏幕的看病难的sss"
+        fontSize: 8
+        useFont: true
+        posX0: 50
+        posY0: 20
+        rgb: [63,68,76]
+      - text: "Page ${PageNum} of ${TotalPages}"
+        fontSize: 8
+        useFont: false
+        posX0: 300
+        posY0: 20
+        rgb: [63,68,76]
+      - text: "Convert at ${Date}"
+        fontSize: 8
+        useFont: true
+        posX0: 500
+        posY0: 40
+        rgb: [63,68,76]
+        dateFormat: "2006年01月02日15时"
+security:
+  userpass:
+  #是否添加打开密码
+    enable: false
+  #打开密码设定，不开启需要保留空
+    password2add: ""
+  ownerpass:
+  #是否添加修改密码
+    enable: true
+  #修改密码设定，不开启需要保留空
+    password2add: "Lt12345"
+    printing: false
+    fullprintquality: false
+    modify: false
+    annotate: false
+    fillforms: false
+    rotateinsert: false
+    extractgraphics: false
+    disabilityextract: false
+imageWatermark:
+  #是否开启水印
+  enable: true
+  #图片目录，如非全路径则默认以程序位置为原位置
+  path: "aaa.png"
+  # 开始偏移X,Y
+  offsetX: 5
+  offsetY: 5
+  # 透明度 0-1 小数 （1：水印完全不透明）
+  opacity: 0.1
+enabled: true
+path: ""
+path2: ""

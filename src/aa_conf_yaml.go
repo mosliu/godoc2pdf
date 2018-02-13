@@ -10,17 +10,18 @@ import (
     "github.com/fatih/color"
 )
 
-// 内容区块P
+// Content:内容区块结构
 type Content struct {
-    Text         string
-    FontSize     float64 `yaml:"fontSize"`
-    UseFont      bool    `yaml:"useFont"`
-    PosX0        float64 `yaml:"posX0"`
-    PosY0        float64 `yaml:"posY0"`
-    RGB          []byte  `yaml:"rgb"`
-    DateFormat   string  `yaml:"dateFormat"`
+    Text       string
+    FontSize   float64 `yaml:"fontSize"`
+    UseFont    bool    `yaml:"useFont"`
+    PosX0      float64 `yaml:"posX0"`
+    PosY0      float64 `yaml:"posY0"`
+    RGB        []byte  `yaml:"rgb"`
+    DateFormat string  `yaml:"dateFormat"`
 }
 
+// Margin: 边界
 type Margin struct {
     Left   float64
     Right  float64
@@ -29,6 +30,7 @@ type Margin struct {
 }
 
 var config Configuration
+// Configuration 配置项
 //注：约定优于配置
 //定义 struct中 首字母大写，yaml中 首字母小写 单词采用同一个
 type Configuration struct {
@@ -38,48 +40,58 @@ type Configuration struct {
         Enable      bool
         SuffixAllow []string `yaml:",flow"`
     }
-    Watermark struct {
-        Enable        bool
-        Path          string
-        WidthCenter   bool    `yaml:"widthCenter"`
-        WidthPos      float64 `yaml:"widthPos"`
-        HeightCenter  bool    `yaml:"heightCenter"`
-        HeightPos     float64 `yaml:"heightPos"`
-        Opacity       float64 `yaml:"opacity"`
-        ScaleToWidth  bool    `yaml:"scaleToWidth"`
-        ScaleToHeight bool    `yaml:"scaleToHeight"`
-    }
-    Textmark struct {
-        Margins Margin `yaml:"margin"`
-        HeadArea struct {
-            Enable   bool
-            FontPath string    `yaml:"fontPath"`
-            Contents []Content `yaml:"contents"`
-        } `yaml:"headArea"`
-        FootArea struct {
-            Enable   bool
-            FontPath string    `yaml:"fontPath"`
-            Contents []Content `yaml:"contents"`
-        } `yaml:"footArea"`
-    }
-    Security struct {
-        UserPass struct {
-            Enable       bool
-            Password2Add string
+    Pdfs struct {
+        Watermark struct {
+            Enable        bool
+            Path          string
+            WidthCenter   bool    `yaml:"widthCenter"`
+            WidthPos      float64 `yaml:"widthPos"`
+            HeightCenter  bool    `yaml:"heightCenter"`
+            HeightPos     float64 `yaml:"heightPos"`
+            Opacity       float64 `yaml:"opacity"`
+            ScaleToWidth  bool    `yaml:"scaleToWidth"`
+            ScaleToHeight bool    `yaml:"scaleToHeight"`
         }
-        OwnerPass struct {
-            Enable            bool
-            Password2Add      string
-            Printing          bool
-            FullPrintQuality  bool
-            Modify            bool
-            Annotate          bool
-            FillForms         bool
-            RotateInsert      bool
-            ExtractGraphics   bool
-            DisabilityExtract bool
+        Textmark struct {
+            Margins Margin `yaml:"margin"`
+            HeadArea struct {
+                Enable   bool
+                FontPath string    `yaml:"fontPath"`
+                Contents []Content `yaml:"contents"`
+            } `yaml:"headArea"`
+            FootArea struct {
+                Enable   bool
+                FontPath string    `yaml:"fontPath"`
+                Contents []Content `yaml:"contents"`
+            } `yaml:"footArea"`
         }
-    }
+        Security struct {
+            UserPass struct {
+                Enable       bool
+                Password2Add string
+            }
+            OwnerPass struct {
+                Enable            bool
+                Password2Add      string
+                Printing          bool
+                FullPrintQuality  bool
+                Modify            bool
+                Annotate          bool
+                FillForms         bool
+                RotateInsert      bool
+                ExtractGraphics   bool
+                DisabilityExtract bool
+            }
+        }
+    } `yaml:"pdfs"`
+
+    ImageWatermark struct {
+        Enable  bool
+        Path    string
+        OffsetX int `yaml:"offsetX"`
+        OffsetY int `yaml:"offsetY"`
+        Opacity float64
+    } `yaml:"image"`
 
     Enabled bool   `yaml:"enabled"` //yaml：yaml格式 enabled：属性的为enabled
     Path    string `yaml:"path"`

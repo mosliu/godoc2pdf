@@ -9,6 +9,7 @@ import (
     "path/filepath"
 )
 
+////PowerPoint：PowerPoint struct
 type PowerPoint struct {
     app           *ole.IDispatch
     presentations *ole.VARIANT

@@ -54,17 +54,17 @@ func addWaterMarkAndEncrypt(inputfile string, outputPath string) {
     if err != nil {
         log.Error(err)
     }
-    if config.Security.UserPass.Enable == false {
-        config.Security.UserPass.Password2Add = ""
+    if config.Pdfs.Security.UserPass.Enable == false {
+        config.Pdfs.Security.UserPass.Password2Add = ""
         //userPass = ""
     }
-    if config.Security.OwnerPass.Enable == false {
-        config.Security.OwnerPass.Password2Add = ""
+    if config.Pdfs.Security.OwnerPass.Enable == false {
+        config.Pdfs.Security.OwnerPass.Password2Add = ""
         //ownerPass = ""
     }
     //如果有一个需要加密则执行
-    if config.Security.UserPass.Enable || config.Security.OwnerPass.Enable {
-        addPassword(outputPath, outputPath, config.Security.UserPass.Password2Add, config.Security.OwnerPass.Password2Add)
+    if config.Pdfs.Security.UserPass.Enable || config.Pdfs.Security.OwnerPass.Enable {
+        addPassword(outputPath, outputPath, config.Pdfs.Security.UserPass.Password2Add, config.Pdfs.Security.OwnerPass.Password2Add)
     }
     err = printAccessInfo(inputfile, "")
     if err != nil {

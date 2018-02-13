@@ -9,6 +9,7 @@ import (
     "path/filepath"
 )
 
+//Excel：excel struct
 type Excel struct {
     app       *ole.IDispatch
     workbooks *ole.VARIANT

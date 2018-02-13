@@ -24,8 +24,8 @@ func addWaterMarkImage(c *creator.Creator, f *os.File) error {
     }
 
     //水印图片方法
-    if config.Watermark.Enable {
-        watermarkImgPath := config.Watermark.Path
+    if config.Pdfs.Watermark.Enable {
+        watermarkImgPath := config.Pdfs.Watermark.Path
         if !isFileExist(watermarkImgPath) {
             watermarkImgPath = filepath.Join(getMainExePath(), watermarkImgPath)
         }
@@ -48,16 +48,16 @@ func addWaterMarkImage(c *creator.Creator, f *os.File) error {
             // Add to creator.
             c.AddPage(page)
 
-            if config.Watermark.ScaleToHeight{
+            if config.Pdfs.Watermark.ScaleToHeight{
                 watermarkImg.ScaleToHeight(c.Context().PageHeight)
             }
-            if config.Watermark.ScaleToWidth{
+            if config.Pdfs.Watermark.ScaleToWidth{
                 watermarkImg.ScaleToWidth(c.Context().PageWidth)
             }
-            x := config.Watermark.WidthPos
-            y := config.Watermark.HeightPos
+            x := config.Pdfs.Watermark.WidthPos
+            y := config.Pdfs.Watermark.HeightPos
             watermarkImg.SetPos(x, y)
-            watermarkImg.SetOpacity(config.Watermark.Opacity)
+            watermarkImg.SetOpacity(config.Pdfs.Watermark.Opacity)
 
             _ = c.Draw(watermarkImg)
 
@@ -76,15 +76,15 @@ func addWaterMarkImage(c *creator.Creator, f *os.File) error {
 
 func addHeaderAndFooter(c *creator.Creator) error {
     // if both set to false,skip
-    if (config.Textmark.HeadArea.Enable || config.Textmark.FootArea.Enable) == false {
+    if (config.Pdfs.Textmark.HeadArea.Enable || config.Pdfs.Textmark.FootArea.Enable) == false {
         return nil
     }
 
     var footerFont, headerFont *pdf.PdfFont
     var err error
 
-    headerFontPath := config.Textmark.HeadArea.FontPath
-    if (len(headerFontPath) == 0) || (!config.Textmark.HeadArea.Enable) {
+    headerFontPath := config.Pdfs.Textmark.HeadArea.FontPath
+    if (len(headerFontPath) == 0) || (!config.Pdfs.Textmark.HeadArea.Enable) {
         headerFont = nil
     } else {
         if !isFileExist(headerFontPath) {
@@ -95,12 +95,12 @@ func addHeaderAndFooter(c *creator.Creator) error {
             return err
         }
     }
-    if !config.Textmark.FootArea.Enable {
+    if !config.Pdfs.Textmark.FootArea.Enable {
         footerFont = nil
-    } else if (headerFont != nil) && strings.EqualFold(config.Textmark.HeadArea.FontPath, config.Textmark.FootArea.FontPath) {
+    } else if (headerFont != nil) && strings.EqualFold(config.Pdfs.Textmark.HeadArea.FontPath, config.Pdfs.Textmark.FootArea.FontPath) {
         footerFont = headerFont
     } else {
-        footerFontPath := config.Textmark.FootArea.FontPath
+        footerFontPath := config.Pdfs.Textmark.FootArea.FontPath
         if !isFileExist(footerFontPath) {
             footerFontPath = filepath.Join(getMainExePath(), footerFontPath)
         }
@@ -111,11 +111,11 @@ func addHeaderAndFooter(c *creator.Creator) error {
     }
 
     // 写页面头部
-    if config.Textmark.HeadArea.Enable {
+    if config.Pdfs.Textmark.HeadArea.Enable {
         c.DrawHeader(func(block *creator.Block, args creator.HeaderFunctionArgs) {
             // Draw the on a block for each page.
             //使用了unidoc的compositefonts 分支
-            contents := config.Textmark.HeadArea.Contents
+            contents := config.Pdfs.Textmark.HeadArea.Contents
             farg := footerAndHeaderArgs{args.PageNum, args.TotalPages}
             //block.ScaleToWidth(c.Context().Width)
             footerAndHeaderDrawler(contents, farg, headerFont, block)
@@ -123,11 +123,11 @@ func addHeaderAndFooter(c *creator.Creator) error {
     }
 
     // 写页面脚部
-    if config.Textmark.FootArea.Enable {
+    if config.Pdfs.Textmark.FootArea.Enable {
         c.DrawFooter(func(block *creator.Block, args creator.FooterFunctionArgs) {
             // Draw the on a block for each page.
             //使用了unidoc的compositefonts 分支
-            contents := config.Textmark.FootArea.Contents
+            contents := config.Pdfs.Textmark.FootArea.Contents
             //block.ScaleToWidth(c.Context().Width)
             farg := footerAndHeaderArgs{args.PageNum, args.TotalPages}
             footerAndHeaderDrawler(contents, farg, footerFont, block)
@@ -207,7 +207,7 @@ func addWatermarkImageAndDateMark(inputPath string, outputPath string) error {
     if err != nil {
         return err
     }
-    c.SetPageMargins(config.Textmark.Margins.Left, config.Textmark.Margins.Right, config.Textmark.Margins.Top, config.Textmark.Margins.Bottom)
+    c.SetPageMargins(config.Pdfs.Textmark.Margins.Left, config.Pdfs.Textmark.Margins.Right, config.Pdfs.Textmark.Margins.Top, config.Pdfs.Textmark.Margins.Bottom)
     //c.SetPageMargins(0, 0, 0, 0)
 
     err = c.WriteToFile(outputPath)

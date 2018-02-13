@@ -9,6 +9,7 @@ import (
     "path/filepath"
 )
 
+////Word：Word struct
 type Word struct {
     app       *ole.IDispatch
     documents *ole.VARIANT

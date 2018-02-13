@@ -13,11 +13,14 @@ import (
 )
 
 var done = make(chan bool, 1)
-var SUPPORT_OFFICE_TYPE = []string{".docx", ".doc",".txt",".htm",".html",".mhtml", ".xls", "xlsx", ".ppt", ".pptx",}
+// SUPPORTOFFICETYPE: 支持的office文件类型
+var SUPPORTOFFICETYPE = []string{".docx", ".doc",".txt",".htm",".html",".mhtml", ".xls", "xlsx", ".ppt", ".pptx",}
+// SUPPORTIMAGETYPE: 支持的image文件类型
+var SUPPORTIMAGETYPE = []string{".jpg", ".jpeg",".png",}
 var compileDate = "2018/1/10"
 func main() {
 
-    app := cli.NewApp()
+    app := cli.NewApp()office2pdf_excel_windows.go
     app.Name = "Doc2Pdf Tool"
     app.Version = "1.0.0.0"
     app.Compiled = time.Now()
@@ -104,14 +107,20 @@ func startConvert(officeFile string) {
     outDir, _ := filepath.Abs(rootPath)
     inFileExt := filepath.Ext(inFile)
     inFileExt = strings.ToLower(inFileExt)
-    var isFileExtOk = false
-    for _, item := range SUPPORT_OFFICE_TYPE {
+    var isOfficeFileExtFlag = false
+    for _, item := range SUPPORTOFFICETYPE {
         if strings.Compare(inFileExt, item) == 0 {
-            isFileExtOk = true
+            isOfficeFileExtFlag = true
+        }
+    }
+    var isImageFileExtFlag = false
+    for _,item := range SUPPORTIMAGETYPE {
+        if strings.Compare(inFileExt, item) == 0 {
+            isImageFileExtFlag = true
         }
     }
     //convert to pdf
-    if isFileExtOk {
+    if isOfficeFileExtFlag {
         exporter := exporterMap()[filepath.Ext(inFile)]
         if _, ok := exporter.(Exporter); ok {
             outFile, err = exporter.(Exporter).Export(inFile, outDir)
@@ -121,6 +130,8 @@ func startConvert(officeFile string) {
             log.Info("output pdf file: " + outFile)
         }
         addWaterMarkAndEncryptByConf(outFile)
+    } else if isImageFileExtFlag{
+        addImageWaterMarkByConf(inFile)
     } else {
         if strings.Compare(inFileExt, ".pdf") == 0 {
             ok, err := testEncrypt(inFile)
@@ -133,8 +144,6 @@ func startConvert(officeFile string) {
             }else{
                 addWaterMarkAndEncryptByConf(inFile)
             }
-
-
         }
     }
 }
